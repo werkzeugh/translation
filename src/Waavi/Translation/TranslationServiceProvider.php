@@ -38,8 +38,9 @@ class TranslationServiceProvider extends LaravelTranslationServiceProvider {
 
 		$this->registerLoader();
 		$this->registerTranslationFileLoader();
+		$this->registerTranslationFileImporter();
 
-		$this->commands('translator.load');
+		$this->commands(Array('translator.load','translator.import'));
 
 		$this->app['translator'] = $this->app->share(function($app)
 		{
@@ -103,6 +104,25 @@ class TranslationServiceProvider extends LaravelTranslationServiceProvider {
 			return new Commands\FileLoaderCommand($languageProvider, $langEntryProvider, $fileLoader);
 		});
 	}
+
+
+	/**
+	 * Register the translation file loader command.
+	 *
+	 * @return void
+	 */
+	public function registerTranslationFileImporter()
+	{
+		$this->app['translator.import'] = $this->app->share(function($app)
+		{
+			$languageProvider 	= new LanguageProvider($app['config']['waavi/translation::language.model']);
+			$langEntryProvider 	= new LanguageEntryProvider($app['config']['waavi/translation::language_entry.model']);
+			$fileLoader 				= new FileLoader($languageProvider, $langEntryProvider, $app);
+			return new Commands\TranslatorImportCommand($languageProvider, $langEntryProvider, $fileLoader);
+		});
+	}
+
+
 
 	/**
 	 * Get the services provided by the provider.
