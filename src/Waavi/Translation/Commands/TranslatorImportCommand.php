@@ -160,8 +160,14 @@ class TranslatorImportCommand extends Command
 		if (stripos($this->path, '/src/lang') !== false)
 		{
 			$packagePath = str_replace('/src/lang', '', $this->path);
-			$namespace = str_replace(base_path() . '/vendor/', '', $packagePath);
-			$namespace = str_replace(base_path() . '/workbench/', '', $packagePath);
+            if(strstr($packagePath, '/vendor/'))
+            {
+                $namespace = str_replace(base_path() . '/vendor/', '', $packagePath);
+            }            
+            elseif(strstr($packagePath, '/workbench/'))
+            {
+                $namespace = str_replace(base_path() . '/workbench/', '', $packagePath);
+            }
 			$namespace = explode('/', $namespace)[1];
 		}
 
