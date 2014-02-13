@@ -39,8 +39,9 @@ class TranslationServiceProvider extends LaravelTranslationServiceProvider {
 		$this->registerLoader();
 		$this->registerTranslationFileLoader();
 		$this->registerTranslationFileImporter();
+		$this->registerTranslationDbWiper();
 
-		$this->commands(Array('translator.load','translator.import'));
+		$this->commands(Array('translator.load','translator.import','translator.wipe'));
 
 		$this->app['translator'] = $this->app->share(function($app)
 		{
@@ -122,6 +123,21 @@ class TranslationServiceProvider extends LaravelTranslationServiceProvider {
 		});
 	}
 
+
+/**
+	 * Register the translation file loader command.
+	 *
+	 * @return void
+	 */
+	public function registerTranslationDbWiper()
+	{
+		$this->app['translator.wipe'] = $this->app->share(function($app)
+		{
+			$languageProvider 	= new LanguageProvider($app['config']['waavi/translation::language.model']);
+			$langEntryProvider 	= new LanguageEntryProvider($app['config']['waavi/translation::language_entry.model']);
+			return new Commands\TranslatorWipeCommand($languageProvider, $langEntryProvider, $fileLoader);
+		});
+	}
 
 
 	/**
